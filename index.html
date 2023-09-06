@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="promissoryNote">
+        <div>
+            <label for="date">Fecha</label>
+            <input type="date" name="date" id="date">
+        </div>
+        <div>
+            <label for="placeName">Nombre del lugar:</label>
+            <input type="text" name="placeName" id="placeName" value="Tlahuelilpan de Ocampo, Hidalgo, México">        
+        </div>
+        <div>        
+            <label for="borrower">El pagare queda a cuenta del nombre de:</label>
+            <input type="text" name="borrower" id="borrower" value="Guillermo Mera Callejas">
+        </div>
+        <div> 
+            <label for="loanAmount">Este pagare vale por la cantidad de:</label>
+            <input type="number" name="loanAmount" id="loanAmount" value=1000>       
+        </div>
+        <div>
+            <label for="paySlices">Numero de pagos:</label>
+            <input type="number" name="paySlices" id="paySlices" value=3>
+        </div>
+        <div>   
+            <label for="deadline">Fecha de pago:</label>
+            <input type="date" name="deadline" id="deadline" value="11-08-2023">     
+        </div>
+        <div>        
+            <label for="payPlace">Lugar de pago:</label>
+            <input type="text" name="payPlace" id="payPlace" value="Bancomer">
+        </div>
+        <div>   
+            <label for="lenderSignature">Emititido por:</label>
+            <input type="text" name="lenderSignature" id="lenderSignature" value="AARON FRANCISCO CRUZ HERNANDEZ">     
+        </div>
+        <button id="promissoryNoteButton">Realizar</button>
+    </div>
+    <div id="promissoryNotes"></div>
+</body>
+<style>
+    html {
+        height: calc(100vh);
+        max-height: calc(100vh);
+        width: calc(100vw);
+        max-width: calc(100vw);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    body {
+        display: flex;
+        background-color: rgba(26, 130, 215, 0.573);
+        height: 93%;
+        max-height: 93%;
+        width: 93%;
+        max-width: 93%;
+        flex-direction: column;
+        gap: 3%;
+    }
+    #promissoryNote {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 3%;
+        max-height: 100%;
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #promissoryNote > div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1%;
+        max-height: 100%;
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #promissoryNote > div > * {
+        width: 100%;
+        max-width: 30%;
+    }
+
+    #promissoryNote > div > label {
+        text-align: right;
+        color: white;
+        font-weight: bold;
+        font-size: 133%;
+    }
+    
+    #promissoryNotes {
+        display: flex;
+        /* justify-content: center;
+        align-items: center; */
+        flex-direction: column;
+        gap: 7px;
+        max-height: 100%;
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        overflow-y: auto;
+        background-color: white;
+    }
+
+    #promissoryNotes > div {
+        border: 1px solid black;
+    }
+
+    #promissoryNoteButton {
+        width: 100%;
+        max-width: 30%;
+        height: 100%;
+        max-height: 100%;
+        background-color: white;
+        color: rgba(26, 130, 215, 0.573);
+        font-weight: bold;
+        font-size: 133%;
+        border: 1px solid rgba(26, 130, 215, 0.573);
+    }
+    #promissoryNoteButton:hover {
+        background-color: rgba(26, 130, 215, 0.573);
+        color: white;
+    }
+    #promissoryNoteButton:active {
+        color: rgba(26, 130, 215, 0.573);
+        background-color: white;
+    }
+</style>
+<script>
+const today = new Date();
+const formattedDate = today.toISOString().split('T')[0];
+document.getElementById("date").value = formattedDate;
+
+const paySlices = document.getElementById('paySlices');
+paySlices.addEventListener('change', () => {
+    const deadline = document.getElementById('deadline');
+    const deadlineDate = today
+    let deadlineDay = deadlineDate.getDate();
+    if (deadlineDay < 10) {
+        deadlineDay = `0${deadlineDay}`;
+    }
+    let deadlineMonth = deadlineDate.getMonth() + +paySlices.value + 1;
+    let years = 0;
+    while (deadlineMonth > 12) {
+        deadlineMonth -= 12;
+        years++;
+    }
+    if (deadlineMonth < 10) {
+        deadlineMonth = `0${deadlineMonth}`;
+    }
+    const deadlineYear = deadlineDate.getFullYear() + years;
+    const deadlineFormattedDate = `${deadlineYear}-${deadlineMonth}-${deadlineDay}`;
+    console.log(deadlineFormattedDate);
+    deadline.value = deadlineFormattedDate;
+})
+paySlices.dispatchEvent(new Event('change'));
+
+    const promissoryNoteButton = document.getElementById('promissoryNoteButton');
+    promissoryNoteButton.addEventListener('click', () => {
+        const date = document.getElementById('date').value;
+        const placeName = document.getElementById('placeName').value;
+        const loanAmount = document.getElementById('loanAmount').value;
+        const borrower = document.getElementById('borrower').value;
+        const payPlace = document.getElementById('payPlace').value;
+        const deadline = document.getElementById('deadline').value;
+        const paySlices = document.getElementById('paySlices').value;
+        const lenderSignature = document.getElementById('lenderSignature').value;
+        const promissoryNote = {
+            date,
+            placeName,
+            loanAmount,
+            borrower,
+            payPlace,
+            deadline,
+            paySlices,
+            lenderSignature
+        }
+
+        const monthPay = Math.round((loanAmount / paySlices) * 100) / 100;
+        const monthPayString = numeroEnPalabras(monthPay);
+        
+        const fragment = document.createDocumentFragment();
+        let month = today.getMonth() + 1;
+        let year = today.getFullYear();
+        let day = today.getDate();
+        if (day < 10) {
+            day = `0${day}`;
+        }
+        const promissoryNoteData = [
+            `Fecha de emisión: ${date}`,
+            `Nombre del lugar: ${placeName}`,
+            `El pagare queda a cuenta del nombre de: ${borrower}`,
+            `Este pagare vale por la cantidad de: ${monthPay} (${monthPayString} pesos)`,
+            `Numero de pagos: ${paySlices}`,
+            `Fecha de pago: `,
+            `Lugar de pago: ${payPlace}`,
+            `Emititido por: ${lenderSignature}`,
+        ]
+        for (let index = 0; index < promissoryNote.paySlices; index++) {
+            const monthPromissoryNote = document.createElement('div');
+            month++;
+            if (month > 12) {
+                month = 1;
+                year++;
+            }
+            if (month < 10) {
+                month = `0${month}`;
+            }
+            const deadlineDate = `${year}-${month}-${day}`;
+            promissoryNoteData.forEach(element => {
+                const dataDiv = document.createElement('div');
+                dataDiv.textContent = element;
+                if (element.includes('Fecha de pago:')) {
+                    dataDiv.textContent += deadlineDate;
+                }
+                monthPromissoryNote.appendChild(dataDiv);
+            });
+            fragment.appendChild(monthPromissoryNote);
+        }
+        const promissoryNotes = document.getElementById('promissoryNotes');
+        while (promissoryNotes.firstChild) {
+            promissoryNotes.removeChild(promissoryNotes.firstChild);
+        }
+        promissoryNotes.appendChild(fragment);
+    })
+    
+    function numeroEnPalabras(numero) {
+        // Arrays para las palabras en español
+        var unidades = ["Cero", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve"];
+        var decenas = ["", "Diez", "Veinte", "Treinta", "Cuarenta", "Cincuenta", "Sesenta", "Setenta", "Ochenta", "Noventa"];
+        var especiales = ["Diez", "Once", "Doce", "Trece", "Catorce", "Quince", "Dieciséis", "Diecisiete", "Dieciocho", "Diecinueve"];
+        var centenas = ["", "Ciento", "Doscientos", "Trescientos", "Cuatrocientos", "Quinientos", "Seiscientos", "Setecientos", "Ochocientos", "Novecientos"];
+
+        // Función para convertir un número menor a 1000 en palabras
+        function convertirMenorMil(num) {
+            if (num === 0) {
+            return "";
+            } else if (num < 10) {
+            return unidades[num];
+            } else if (num < 20) {
+            return especiales[num - 10];
+            } else {
+            var unidad = num % 10;
+            var decena = Math.floor(num / 10) % 10;
+            var centena = Math.floor(num / 100);
+            var palabras = "";
+
+            if (centena > 0) {
+                palabras += centenas[centena];
+                if (decena > 0 || unidad > 0) {
+                palabras += " ";
+                }
+            }
+
+            if (decena > 0) {
+                palabras += decenas[decena];
+                if (unidad > 0) {
+                palabras += " y ";
+                }
+            }
+
+            if (unidad > 0) {
+                palabras += unidades[unidad];
+            }
+
+            return palabras;
+            }
+        }
+
+        // Separar la parte entera y la parte decimal
+        var parteEntera = Math.floor(numero);
+        var parteDecimal = Math.round((numero % 1) * 100); // Para dos decimales
+
+        // Convertir la parte entera en palabras
+        var palabras = "";
+
+        if (parteEntera === 0) {
+            palabras = unidades[0];
+        } else if (parteEntera < 1000) {
+            palabras = convertirMenorMil(parteEntera);
+        } else {
+            var billon = Math.floor(parteEntera / 1000000000);
+            var millones = Math.floor((parteEntera % 1000000000) / 1000000);
+            var miles = Math.floor((parteEntera % 1000000) / 1000);
+            var unidadesMil = parteEntera % 1000;
+
+            if (billon > 0) {
+            palabras += convertirMenorMil(billon) + " Billones";
+            if (millones > 0 || miles > 0 || unidadesMil > 0) {
+                palabras += " ";
+            }
+            }
+
+            if (millones > 0) {
+            palabras += convertirMenorMil(millones) + " Millones";
+            if (miles > 0 || unidadesMil > 0) {
+                palabras += " ";
+            }
+            }
+
+            if (miles > 0) {
+            palabras += convertirMenorMil(miles) + " Mil";
+            if (unidadesMil > 0) {
+                palabras += " ";
+            }
+            }
+
+            if (unidadesMil > 0) {
+            palabras += convertirMenorMil(unidadesMil);
+            }
+        }
+
+        // Agregar la parte decimal en palabras si es mayor que cero
+        if (parteDecimal > 0) {
+            palabras += " punto " + convertirMenorMil(parteDecimal);
+        }
+
+        return palabras;
+    }
+</script>
+</html>
